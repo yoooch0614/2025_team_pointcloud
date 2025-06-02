@@ -1,0 +1,14 @@
+opencv-python
+numpy
+pandas  # pundas → pandas
+scipy
+piexif
+Pillow
+requests  # pickup_5.pyで使用
+
+# 以下は標準ライブラリなので不要
+# subprocess
+# datetime  # datatime → datetime（標準ライブラリ）
+# fractions（標準ライブラリ）
+# os（標準ライブラリ）
+# re（標準ライブラリ）

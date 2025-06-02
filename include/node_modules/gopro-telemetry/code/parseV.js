@@ -1,0 +1,84 @@
+//Main data accessing function. Reads the V in KLV
+
+const Parser = require('binary-parser').Parser;
+const { types } = require('./data/keys');
+const breathe = require('./utils/breathe');
+//Will store unknown types
+let unknown = new Set();
+
+const valueParsers = {};
+
+function getValueParserForType(type, opts) {
+  const key = `${type}-${JSON.stringify(opts)}`;
+  if (!valueParsers.hasOwnProperty(key)) {
+    valueParsers[key] = new Parser().endianess('big');
+    if (!valueParsers[key][types[type].func]) {
+      throw new Error(`Unknown type "${type}" (func "${types[type].func}")`);
+    }
+    valueParsers[key] = valueParsers[key][types[type].func]('value', opts);
+  }
+  return valueParsers[key];
+}
+
+//Refactor for performance/memory?
+function parseV(environment, slice, len, specifics) {
+  const { data, options, ks } = environment;
+  const { ax = 1, type = ks.type, complexType } = specifics;
+
+  //Split data when axes present
+  if (ax > 1) {
+    //Will return array of values
+    let res = [];
+
+    let sliceProgress = 0;
+    for (let i = 0; i < ax; i++) {
+      let innerType = type;
+      //Pick type from previously read data if needed
+      if (types[type].complex) innerType = complexType[i];
+      //Log unknown types for future implementation
+      if (!types[innerType]) {
+        unknown.add(type);
+        res.push(null);
+      } else {
+        const from = slice + sliceProgress;
+        const axLen =
+          types[innerType].size ||
+          (types[innerType].opt || {}).length ||
+          len / ax;
+        sliceProgress += axLen;
+        res.push(
+          parseV(environment, from, axLen, {
+            ax: 1,
+            type: innerType,
+            complexType
+          })
+        );
+      }
+    }
+
+    //If debugging, print unexpected types
+    if (options.debug && unknown.size)
+      breathe().then(() =>
+        console.warn('unknown types:', [...unknown].join(','))
+      );
+    return res;
+
+    //Otherwise, read a single value
+  } else if (!types[type].complex) {
+    //Add options required by type
+    let opts = { length: len };
+    if (types[type].opt) {
+      Object.assign(opts, types[type].opt);
+    }
+    //We pick the necessary function based on data format (stored in types)
+    let valParser = getValueParserForType(type, opts);
+    const parsed = valParser.parse(data.subarray(slice));
+    if (types[type].forceNum) parsed.value = Number(parsed.value);
+
+    return parsed.value;
+
+    //Data is complex but did not find axes
+  } else throw new Error('Complex type ? with only one axis');
+}
+
+module.exports = parseV;

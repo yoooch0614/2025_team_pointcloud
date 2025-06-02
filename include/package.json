@@ -1,0 +1,22 @@
+{
+  "name": "gopro-telemetry-workspace",
+  "version": "1.0.0",
+  "description": "GoPro telemetry extraction workspace",
+  "main": "../src/extract_gopro_telemetry.js",
+  "dependencies": {
+    "gpmf-extract": "0.3.2",
+    "gopro-telemetry": "1.2.9"
+  },
+  "scripts": {
+    "extract": "node ../src/extract_gopro_telemetry.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "gopro",
+    "telemetry",
+    "gps",
+    "gpmf"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

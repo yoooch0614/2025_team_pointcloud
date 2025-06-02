@@ -1,0 +1,2 @@
+#!/home/eriko/デスクトップ/pointcloud_ws/include/nodejs18/bin/node
+require('../lib/cli.js')(process)

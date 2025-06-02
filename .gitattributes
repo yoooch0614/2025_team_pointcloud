@@ -1,0 +1,8 @@
+include/ffmpeg/* filter=lfs diff=lfs merge=lfs -text
+include/nodejs18/* filter=lfs diff=lfs merge=lfs -text
+include/python313/* filter=lfs diff=lfs merge=lfs -text
+include/**/*.exe filter=lfs diff=lfs merge=lfs -text
+include/**/*.so filter=lfs diff=lfs merge=lfs -text
+include/**/*.a filter=lfs diff=lfs merge=lfs -text
+*.mov filter=lfs diff=lfs merge=lfs -text
+*.360 filter=lfs diff=lfs merge=lfs -text
